@@ -1,5 +1,6 @@
 package io.github.jezreal.routes
 
+import io.github.jezreal.auth.authRoutes
 import io.github.jezreal.response.Response
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -10,6 +11,7 @@ fun Routing.apiRoutes() {
         get {
             call.respond(Response("RFR backend"))
         }
+        authRoutes()
     }
 }
 
