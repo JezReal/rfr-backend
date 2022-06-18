@@ -13,6 +13,7 @@ fun Application.module() {
     Configuration.setEnvironment(environment)
     configureDatabase()
     configureRouting()
+    configureStatusPages()
     configureSecurity()
     configureHTTP()
     configureSerialization()

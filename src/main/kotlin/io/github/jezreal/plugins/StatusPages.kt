@@ -1,5 +1,7 @@
 package io.github.jezreal.plugins
 
+import io.github.jezreal.exception.AuthenticationException
+import io.github.jezreal.exception.AuthorizationException
 import io.github.jezreal.exception.ResourceNotFoundException
 import io.github.jezreal.response.Response
 import io.ktor.http.*
@@ -11,6 +13,22 @@ fun Application.configureStatusPages() {
     install(StatusPages) {
         exception<ResourceNotFoundException> { call, exception ->
             call.respond(HttpStatusCode.NotFound, Response(exception.message))
+        }
+
+        exception<AuthenticationException> { call, exception ->
+            call.respond(HttpStatusCode.Unauthorized, Response(exception.message))
+        }
+
+        exception<ResourceNotFoundException> { call, exception ->
+            call.respond(HttpStatusCode.NotFound, Response(exception.message))
+        }
+
+        exception<AuthorizationException> { call, exception ->
+            call.respond(HttpStatusCode.Forbidden, Response(exception.message))
+        }
+
+        status(HttpStatusCode.Unauthorized) { statusCode ->
+            call.respond(statusCode, Response("Invalid token"))
         }
     }
 }
