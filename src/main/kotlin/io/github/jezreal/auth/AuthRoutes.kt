@@ -32,6 +32,15 @@ fun Route.authRoutes() {
         call.respond(RefreshTokenDto(tokenDto.refreshToken))
     }
 
+    post("/refresh") {
+        val request = call.receive<RefreshTokenDto>()
+        val accessToken = authService.refreshAccessToken(request)
+
+        call.response.headers.append(HttpHeaders.Authorization, "Bearer $accessToken")
+
+        call.respond(HttpStatusCode.OK)
+    }
+
     authenticate {
         get("/protected") {
             val principal = call.principal<JWTPrincipal>()

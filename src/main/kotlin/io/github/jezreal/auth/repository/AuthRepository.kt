@@ -23,4 +23,20 @@ object AuthRepository {
                 }
         }
     }
+
+    fun getUserCredentialByCredentialId(credentialId: Long): UserCredentialModel? {
+        return transaction {
+            Credentials.join(AccountTypes, JoinType.INNER, additionalConstraint = {
+                Credentials.accountTypeId eq AccountTypes.accountTypeId
+            })
+                .select { Credentials.credentialId eq credentialId }.firstOrNull()?.let {
+                    UserCredentialModel(
+                        it[Credentials.username],
+                        it[Credentials.password],
+                        it[AccountTypes.accountType],
+                        it[Credentials.credentialId]
+                    )
+                }
+        }
+    }
 }

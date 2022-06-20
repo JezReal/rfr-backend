@@ -3,13 +3,14 @@ package io.github.jezreal.auth.service
 import at.favre.lib.crypto.bcrypt.BCrypt
 import io.github.jezreal.auth.RoleUtil
 import io.github.jezreal.auth.dto.LoginDto
+import io.github.jezreal.auth.dto.RefreshTokenDto
 import io.github.jezreal.auth.model.TokenModel
 import io.github.jezreal.auth.model.UserCredentialModel
 import io.github.jezreal.auth.repository.AuthRepository
 import io.github.jezreal.configuration.Configuration
-import io.github.jezreal.exception.ResourceNotFoundException
 import io.github.jezreal.exception.AuthenticationException
 import io.github.jezreal.exception.AuthorizationException
+import io.github.jezreal.exception.ResourceNotFoundException
 
 object AuthService {
     private val authRepository = AuthRepository
@@ -52,5 +53,17 @@ object AuthService {
         val result = BCrypt.verifyer().verify(loginDto.password.toCharArray(), passwordFromDatabase)
 
         return result.verified
+    }
+
+    fun refreshAccessToken(refreshTokenDto: RefreshTokenDto): String {
+        val decodedJwt = securityConfiguration.validateRefreshToken(refreshTokenDto.refreshToken)
+            ?: throw AuthenticationException("Invalid refresh token")
+
+        val credentialId = decodedJwt.getClaim("credentialId").asLong()
+
+        val credential = authRepository.getUserCredentialByCredentialId(credentialId)
+            ?: throw ResourceNotFoundException("Account does not exist")
+
+        return securityConfiguration.makeAccessToken(credential.username, credential.role)
     }
 }
