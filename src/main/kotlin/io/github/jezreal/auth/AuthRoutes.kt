@@ -51,7 +51,7 @@ fun Route.authRoutes() {
             }
 
             if (!isAdmin(principal)) {
-                throw AuthorizationException("Your account is not allowed to access this resource")
+                throw AuthorizationException("You are not allowed to access this resource")
             }
 
             call.respond(Response("Hello authenticated admin"))

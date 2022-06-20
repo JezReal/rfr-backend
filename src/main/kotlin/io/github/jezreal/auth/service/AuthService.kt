@@ -41,7 +41,7 @@ object AuthService {
                 return TokenModel(accessToken, refreshToken)
             }
 
-            throw AuthorizationException("Your account is not allowed to access this resource")
+            throw AuthorizationException("You are not allowed to access this resource")
         }
 
         throw AuthenticationException("Invalid credentials")
