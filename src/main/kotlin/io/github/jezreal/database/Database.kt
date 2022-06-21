@@ -7,7 +7,6 @@ import io.github.jezreal.tables.auth.AccountTypes
 import io.github.jezreal.tables.auth.Credentials
 import io.github.jezreal.tables.item.ItemCategories
 import io.github.jezreal.tables.item.Items
-import io.github.jezreal.tables.price.Prices
 import io.github.jezreal.tables.store.StoreItems
 import io.github.jezreal.tables.store.Stores
 import org.jetbrains.exposed.sql.Database
@@ -42,7 +41,6 @@ private fun createTables() {
             Items,
             Credentials,
             AccountTypes,
-            Prices,
             Stores,
             StoreItems
         )
@@ -58,7 +56,6 @@ private fun dropTables() {
             Items,
             Stores,
             AccountTypes,
-            Prices,
             StoreItems,
             Credentials,
         )

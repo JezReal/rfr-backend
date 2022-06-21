@@ -3,13 +3,10 @@ package io.github.jezreal.database
 import at.favre.lib.crypto.bcrypt.BCrypt
 import io.github.jezreal.configuration.Configuration
 import io.github.jezreal.constants.AccountTypeConstants
-import io.github.jezreal.item.repository.ItemRepository
-import io.github.jezreal.pricelist.dto.ItemPriceDto
+import io.github.jezreal.item.dto.ItemPriceDto
+import io.github.jezreal.item.repository.PriceRepository
 import io.github.jezreal.tables.auth.AccountTypes
 import io.github.jezreal.tables.auth.Credentials
-import io.github.jezreal.tables.item.ItemCategories
-import io.github.jezreal.tables.item.Items
-import io.github.jezreal.tables.price.Prices
 import io.github.jezreal.tables.store.Stores
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.insert
@@ -61,7 +58,7 @@ fun insertAdminAccount() {
 }
 
 fun insertInitialPriceList() {
-    val itemRepository = ItemRepository
+    val priceRepository = PriceRepository
 
     val initialPriceList = listOf(
         ItemPriceDto(
@@ -422,30 +419,6 @@ fun insertInitialPriceList() {
     )
 
     for (item in initialPriceList) {
-        var itemCategoryId = itemRepository.getItemByItemCategoryName(item.itemCategory)?.itemCategoryId
-
-        if (itemCategoryId == null) {
-            itemCategoryId = transaction {
-                ItemCategories.insert {
-                    it[itemCategory] = item.itemCategory
-                } get ItemCategories.itemCategoryId
-            }
-        }
-
-        val priceId = transaction {
-            Prices.insert {
-                it[pricePerUnitLabel] = item.pricePerUnitLabel
-                it[pricePerUnit] = item.pricePerUnit
-                it[pricePerBag] = item.pricePerBag
-            } get Prices.priceId
-        }
-
-        transaction {
-            Items.insert {
-                it[itemName] = item.itemName
-                it[Items.itemCategoryId] = itemCategoryId
-                it[Items.priceId] = priceId
-            }
-        }
+        priceRepository.addItemToPriceList(item)
     }
 }
