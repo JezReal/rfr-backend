@@ -2,6 +2,7 @@ package io.github.jezreal.plugins
 
 import io.github.jezreal.exception.AuthenticationException
 import io.github.jezreal.exception.AuthorizationException
+import io.github.jezreal.exception.BadRequestException
 import io.github.jezreal.exception.ResourceNotFoundException
 import io.github.jezreal.response.Response
 import io.ktor.http.*
@@ -29,6 +30,22 @@ fun Application.configureStatusPages() {
 
         status(HttpStatusCode.Unauthorized) { statusCode ->
             call.respond(statusCode, Response("Invalid token"))
+        }
+
+        exception<NumberFormatException> { call, _ ->
+            call.respond(HttpStatusCode.BadRequest, Response("Invalid request body"))
+        }
+
+        exception<BadRequestException> { call, exception ->
+            call.respond(HttpStatusCode.BadRequest, Response(exception.message))
+        }
+
+        exception<NullPointerException> { call, _ ->
+            call.respond(HttpStatusCode.BadRequest, Response("Invalid request body"))
+        }
+
+        status(HttpStatusCode.InternalServerError) { statusCode ->
+            call.respond(statusCode, Response("Something went wrong with the server"))
         }
     }
 }
