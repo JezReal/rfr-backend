@@ -23,4 +23,20 @@ object ItemRepository {
                 }
         }
     }
+
+    fun getItemByItemName(itemName: String): ItemModel? {
+        return transaction {
+            Items.join(ItemCategories, JoinType.INNER, additionalConstraint = {
+                Items.itemCategoryId eq ItemCategories.itemCategoryId
+            })
+                .select { Items.itemName eq itemName }.firstOrNull()?.let {
+                    ItemModel(
+                        it[Items.itemId],
+                        it[ItemCategories.itemCategoryId],
+                        it[ItemCategories.itemCategory],
+                        it[Items.itemName]
+                    )
+                }
+        }
+    }
 }
