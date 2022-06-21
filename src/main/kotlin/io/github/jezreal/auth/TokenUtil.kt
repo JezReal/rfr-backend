@@ -19,3 +19,9 @@ fun isAdmin(principal: JWTPrincipal): Boolean {
 
     return role == RoleUtil.ADMIN
 }
+
+fun isStore(principal: JWTPrincipal): Boolean {
+    val role = principal.payload.getClaim("role").asString()
+
+    return role == RoleUtil.STORE || role == RoleUtil.ADMIN
+}

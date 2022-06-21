@@ -1,9 +1,12 @@
 package io.github.jezreal.item.repository
 
 import io.github.jezreal.item.dto.ItemPriceDto
+import io.github.jezreal.item.model.ItemPriceModel
 import io.github.jezreal.tables.item.ItemCategories
 import io.github.jezreal.tables.item.Items
+import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object PriceRepository {
@@ -19,7 +22,7 @@ object PriceRepository {
                 } get ItemCategories.itemCategoryId
             }
         }
-        
+
         return transaction {
             Items.insert {
                 it[itemName] = itemPriceDto.itemName
@@ -28,6 +31,25 @@ object PriceRepository {
                 it[pricePerUnit] = itemPriceDto.pricePerUnit
                 it[pricePerBag] = itemPriceDto.pricePerBag
             } get Items.itemId
+        }
+    }
+
+    fun getPriceList(): List<ItemPriceModel> {
+        return transaction {
+            Items.join(ItemCategories, JoinType.INNER, additionalConstraint = {
+                Items.itemCategoryId eq ItemCategories.itemCategoryId
+            })
+                .selectAll().map {
+                    ItemPriceModel(
+                        it[Items.itemId],
+                        it[Items.itemCategoryId],
+                        it[ItemCategories.itemCategory],
+                        it[Items.itemName],
+                        it[Items.pricePerUnitLabel],
+                        it[Items.pricePerUnit],
+                        it[Items.pricePerBag]
+                    )
+                }
         }
     }
 }

@@ -2,6 +2,7 @@ package io.github.jezreal.item.service
 
 import io.github.jezreal.exception.BadRequestException
 import io.github.jezreal.item.dto.ItemPriceDto
+import io.github.jezreal.item.model.ItemPriceModel
 import io.github.jezreal.item.repository.ItemRepository
 import io.github.jezreal.item.repository.PriceRepository
 
@@ -17,5 +18,9 @@ object PriceService {
         }
 
         return priceRepository.addItemToPriceList(itemPriceDto)
+    }
+
+    fun getPriceList(): List<ItemPriceModel> {
+        return priceRepository.getPriceList()
     }
 }

@@ -2,9 +2,11 @@ package io.github.jezreal.item
 
 import io.github.jezreal.auth.isAccessToken
 import io.github.jezreal.auth.isAdmin
+import io.github.jezreal.auth.isStore
 import io.github.jezreal.exception.AuthorizationException
 import io.github.jezreal.item.dto.ItemCreatedDto
 import io.github.jezreal.item.dto.ItemPriceDto
+import io.github.jezreal.item.model.toItemPriceWithIdDto
 import io.github.jezreal.item.service.PriceService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -30,6 +32,20 @@ fun Route.priceRoutes() {
 
             val request = call.receive<ItemPriceDto>()
             call.respond(HttpStatusCode.Created, ItemCreatedDto(priceService.addItemInPriceList(request)))
+        }
+
+        get("/pricelist") {
+            val principal = call.principal<JWTPrincipal>()
+
+            if (!isAccessToken(principal!!)) {
+                throw AuthorizationException("Invalid token type")
+            }
+
+            if (!isStore(principal)) {
+                throw AuthorizationException("You are not allowed to access this resource")
+            }
+
+            call.respond(priceService.getPriceList().toItemPriceWithIdDto())
         }
     }
 }
