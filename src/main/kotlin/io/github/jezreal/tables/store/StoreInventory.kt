@@ -4,7 +4,7 @@ import io.github.jezreal.tables.item.ItemCategories
 import io.github.jezreal.tables.item.Items
 import org.jetbrains.exposed.sql.Table
 
-object StoreItems : Table() {
+object StoreInventory : Table() {
     val storeItemId = long("store_item_id").autoIncrement()
     val storeItemAmount = long("store_item_amount")
     val itemId = long("item_id").references(Items.itemId)
