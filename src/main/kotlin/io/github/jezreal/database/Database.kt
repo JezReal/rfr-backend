@@ -5,8 +5,9 @@ import com.zaxxer.hikari.HikariDataSource
 import io.github.jezreal.configuration.Configuration
 import io.github.jezreal.tables.auth.AccountTypes
 import io.github.jezreal.tables.auth.Credentials
+import io.github.jezreal.tables.item.ItemCategories
+import io.github.jezreal.tables.item.Items
 import io.github.jezreal.tables.price.Prices
-import io.github.jezreal.tables.store.StoreItemCategories
 import io.github.jezreal.tables.store.StoreItems
 import io.github.jezreal.tables.store.Stores
 import org.jetbrains.exposed.sql.Database
@@ -37,11 +38,12 @@ private fun createTables() {
         addLogger(StdOutSqlLogger)
 
         SchemaUtils.create(
+            ItemCategories,
+            Items,
             Credentials,
             AccountTypes,
             Prices,
             Stores,
-            StoreItemCategories,
             StoreItems
         )
     }
@@ -52,10 +54,11 @@ private fun dropTables() {
         addLogger(StdOutSqlLogger)
 
         SchemaUtils.drop(
+            ItemCategories,
+            Items,
             Stores,
             AccountTypes,
             Prices,
-            StoreItemCategories,
             StoreItems,
             Credentials,
         )
@@ -66,4 +69,5 @@ fun prepopulateTables() {
     insertAccountTypes()
     insertTestAccount()
     insertAdminAccount()
+    insertInitialPriceList()
 }
