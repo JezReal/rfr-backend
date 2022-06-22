@@ -6,6 +6,7 @@ import io.github.jezreal.tables.item.ItemCategories
 import io.github.jezreal.tables.item.Items
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -40,6 +41,25 @@ object PriceRepository {
                 Items.itemCategoryId eq ItemCategories.itemCategoryId
             })
                 .selectAll().map {
+                    ItemPriceModel(
+                        it[Items.itemId],
+                        it[Items.itemCategoryId],
+                        it[ItemCategories.itemCategory],
+                        it[Items.itemName],
+                        it[Items.pricePerUnitLabel],
+                        it[Items.pricePerUnit],
+                        it[Items.pricePerBag]
+                    )
+                }
+        }
+    }
+
+    fun getItemPriceByItemId(itemId: Long): ItemPriceModel? {
+        return transaction {
+            Items.join(ItemCategories, JoinType.INNER, additionalConstraint = {
+                Items.itemCategoryId eq ItemCategories.itemCategoryId
+            })
+                .select { Items.itemId eq itemId }.firstOrNull()?.let {
                     ItemPriceModel(
                         it[Items.itemId],
                         it[Items.itemCategoryId],

@@ -1,8 +1,10 @@
 package io.github.jezreal.item.service
 
 import io.github.jezreal.exception.BadRequestException
+import io.github.jezreal.exception.ResourceNotFoundException
 import io.github.jezreal.item.dto.ItemPriceByCategoryDto
 import io.github.jezreal.item.dto.ItemPriceDto
+import io.github.jezreal.item.model.toItemPriceDto
 import io.github.jezreal.item.model.toItemPriceWithIdDto
 import io.github.jezreal.item.repository.ItemRepository
 import io.github.jezreal.item.repository.PriceRepository
@@ -40,5 +42,11 @@ object PriceService {
         }
 
         return priceListByCategory
+    }
+
+    fun getPriceByItemId(itemId: Long): ItemPriceDto {
+        val itemPrice = priceRepository.getItemPriceByItemId(itemId) ?: throw ResourceNotFoundException("Item not found")
+
+        return itemPrice.toItemPriceDto()
     }
 }

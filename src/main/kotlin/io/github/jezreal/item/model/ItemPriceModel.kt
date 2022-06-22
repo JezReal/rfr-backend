@@ -1,5 +1,6 @@
 package io.github.jezreal.item.model
 
+import io.github.jezreal.item.dto.ItemPriceDto
 import io.github.jezreal.item.dto.ItemPriceWithIdDto
 
 data class ItemPriceModel(
@@ -21,3 +22,11 @@ fun List<ItemPriceModel>.toItemPriceWithIdDto() = map {
         it.pricePerBag
     )
 }
+
+fun ItemPriceModel.toItemPriceDto() = ItemPriceDto(
+    this.itemCategory,
+    this.itemName,
+    this.pricePerUnitLabel,
+    this.pricePerUnit,
+    this.pricePerBag
+)

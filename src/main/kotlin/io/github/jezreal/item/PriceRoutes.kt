@@ -11,6 +11,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -45,6 +46,22 @@ fun Route.priceRoutes() {
             }
 
             call.respond(priceService.getPriceList())
+        }
+
+        get("/price/{itemId}") {
+            val principal = call.principal<JWTPrincipal>()
+
+            if (!isAccessToken(principal!!)) {
+                throw AuthorizationException("Invalid token type")
+            }
+
+            if (!isStore(principal)) {
+                throw AuthorizationException("You are not allowed to access this resource")
+            }
+
+            val itemId = call.parameters["itemId"]?.toLong() ?: throw BadRequestException("Invalid item id")
+
+            call.respond(priceService.getPriceByItemId(itemId))
         }
     }
 }
