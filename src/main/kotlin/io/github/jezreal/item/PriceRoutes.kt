@@ -6,7 +6,6 @@ import io.github.jezreal.auth.isStore
 import io.github.jezreal.exception.AuthorizationException
 import io.github.jezreal.item.dto.ItemCreatedDto
 import io.github.jezreal.item.dto.ItemPriceDto
-import io.github.jezreal.item.model.toItemPriceWithIdDto
 import io.github.jezreal.item.service.PriceService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -45,7 +44,7 @@ fun Route.priceRoutes() {
                 throw AuthorizationException("You are not allowed to access this resource")
             }
 
-            call.respond(priceService.getPriceList().toItemPriceWithIdDto())
+            call.respond(priceService.getPriceList())
         }
     }
 }

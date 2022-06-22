@@ -15,7 +15,6 @@ data class ItemPriceModel(
 fun List<ItemPriceModel>.toItemPriceWithIdDto() = map {
     ItemPriceWithIdDto(
         it.itemId,
-        it.itemCategory,
         it.itemName,
         it.pricePerUnitLabel,
         it.pricePerUnit,
