@@ -33,7 +33,7 @@ fun Application.configureStatusPages() {
         }
 
         exception<NumberFormatException> { call, _ ->
-            call.respond(HttpStatusCode.BadRequest, Response("Invalid request body"))
+            call.respond(HttpStatusCode.BadRequest, Response("Invalid request"))
         }
 
         exception<BadRequestException> { call, exception ->
