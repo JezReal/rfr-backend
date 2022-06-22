@@ -3,7 +3,9 @@ package io.github.jezreal.item.service
 import io.github.jezreal.exception.BadRequestException
 import io.github.jezreal.exception.ResourceNotFoundException
 import io.github.jezreal.item.dto.ItemPriceByCategoryDto
+import io.github.jezreal.item.dto.ItemPriceByCategoryWithIdDto
 import io.github.jezreal.item.dto.ItemPriceDto
+import io.github.jezreal.item.model.toItemPriceByCategoryDto
 import io.github.jezreal.item.model.toItemPriceDto
 import io.github.jezreal.item.model.toItemPriceWithIdDto
 import io.github.jezreal.item.repository.ItemRepository
@@ -23,10 +25,10 @@ object PriceService {
         return priceRepository.addItemToPriceList(itemPriceDto)
     }
 
-    fun getPriceList(): List<ItemPriceByCategoryDto> {
+    fun getPriceList(): List<ItemPriceByCategoryWithIdDto> {
         val priceList = priceRepository.getPriceList()
         val categories = priceList.distinctBy { it.itemCategory }
-        val priceListByCategory = mutableListOf<ItemPriceByCategoryDto>()
+        val priceListByCategory = mutableListOf<ItemPriceByCategoryWithIdDto>()
 
         for (category in categories) {
             val pricesInCategory = priceList.filter {
@@ -34,7 +36,8 @@ object PriceService {
             }.toItemPriceWithIdDto()
 
             priceListByCategory.add(
-                ItemPriceByCategoryDto(
+                ItemPriceByCategoryWithIdDto(
+                    category.itemCategoryId,
                     category.itemCategory,
                     pricesInCategory
                 )
@@ -45,8 +48,13 @@ object PriceService {
     }
 
     fun getPriceByItemId(itemId: Long): ItemPriceDto {
-        val itemPrice = priceRepository.getItemPriceByItemId(itemId) ?: throw ResourceNotFoundException("Item not found")
+        val itemPrice =
+            priceRepository.getItemPriceByItemId(itemId) ?: throw ResourceNotFoundException("Item not found")
 
         return itemPrice.toItemPriceDto()
+    }
+
+    fun getPriceListByItemCategory(categoryId: Long): ItemPriceByCategoryDto {
+        return priceRepository.getPriceListByCategoryId(categoryId).toItemPriceByCategoryDto()
     }
 }

@@ -72,4 +72,24 @@ object PriceRepository {
                 }
         }
     }
+
+    fun getPriceListByCategoryId(categoryId: Long): List<ItemPriceModel> {
+        return transaction {
+            Items.join(ItemCategories, JoinType.INNER, additionalConstraint = {
+                Items.itemCategoryId eq ItemCategories.itemCategoryId
+            })
+                .select { ItemCategories.itemCategoryId eq categoryId }
+                .map {
+                    ItemPriceModel(
+                        it[Items.itemId],
+                        it[Items.itemCategoryId],
+                        it[ItemCategories.itemCategory],
+                        it[Items.itemName],
+                        it[Items.pricePerUnitLabel],
+                        it[Items.pricePerUnit],
+                        it[Items.pricePerBag]
+                    )
+                }
+        }
+    }
 }

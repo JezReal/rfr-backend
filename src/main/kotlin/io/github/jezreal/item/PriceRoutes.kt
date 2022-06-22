@@ -63,5 +63,21 @@ fun Route.priceRoutes() {
 
             call.respond(priceService.getPriceByItemId(itemId))
         }
+
+        get("/price/category/{categoryId}") {
+            val principal = call.principal<JWTPrincipal>()
+
+            if (!isAccessToken(principal!!)) {
+                throw AuthorizationException("Invalid token type")
+            }
+
+            if (!isStore(principal)) {
+                throw AuthorizationException("You are not allowed to access this resource")
+            }
+
+            val categoryId = call.parameters["categoryId"]?.toLong() ?: throw BadRequestException("Invalid item id")
+
+            call.respond(priceService.getPriceListByItemCategory(categoryId))
+        }
     }
 }
