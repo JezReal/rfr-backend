@@ -33,7 +33,7 @@ object PriceService {
         for (category in categories) {
             val pricesInCategory = priceList.filter {
                 it.itemCategory == category.itemCategory
-            }.toItemPriceWithIdDto()
+            }.toItemPriceWithIdDto().sortedBy { it.itemId }
 
             priceListByCategory.add(
                 ItemPriceByCategoryWithIdDto(
