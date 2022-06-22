@@ -13,6 +13,6 @@ data class ItemPriceWithIdDto(
     val pricePerUnitLabel: String,
     @SerializedName("price_per_unit")
     val pricePerUnit: Double,
-//    @SerializedName("price_per_bag")
+    @SerializedName("price_per_bag")
     val pricePerBag: Double
 )
