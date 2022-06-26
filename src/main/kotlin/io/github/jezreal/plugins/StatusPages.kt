@@ -1,5 +1,6 @@
 package io.github.jezreal.plugins
 
+import com.auth0.jwt.exceptions.TokenExpiredException
 import io.github.jezreal.exception.AuthenticationException
 import io.github.jezreal.exception.AuthorizationException
 import io.github.jezreal.exception.BadRequestException
@@ -46,6 +47,10 @@ fun Application.configureStatusPages() {
 
         status(HttpStatusCode.InternalServerError) { statusCode ->
             call.respond(statusCode, Response("Something went wrong with the server"))
+        }
+
+        exception<TokenExpiredException> { call, _ ->
+            call.respond(HttpStatusCode.Unauthorized, Response("Invalid refresh token"))
         }
     }
 }
