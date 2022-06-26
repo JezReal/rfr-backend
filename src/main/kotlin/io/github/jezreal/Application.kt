@@ -12,6 +12,7 @@ fun main(args: Array<String>): Unit =
 fun Application.module() {
     Configuration.setEnvironment(environment)
     configureDatabase()
+    configureSession()
     configureRouting()
     configureStatusPages()
     configureSecurity()
