@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import io.github.jezreal.configuration.Configuration
 import io.github.jezreal.tables.auth.AccountTypes
 import io.github.jezreal.tables.auth.Credentials
+import io.github.jezreal.tables.auth.RefreshTokens
 import io.github.jezreal.tables.item.ItemCategories
 import io.github.jezreal.tables.item.Items
 import io.github.jezreal.tables.store.StoreInventory
@@ -37,6 +38,7 @@ private fun createTables() {
         addLogger(StdOutSqlLogger)
 
         SchemaUtils.create(
+            RefreshTokens,
             ItemCategories,
             Items,
             Credentials,
@@ -52,6 +54,7 @@ private fun dropTables() {
         addLogger(StdOutSqlLogger)
 
         SchemaUtils.drop(
+            RefreshTokens,
             ItemCategories,
             Items,
             Stores,

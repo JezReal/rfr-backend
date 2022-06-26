@@ -7,9 +7,9 @@ import com.auth0.jwt.interfaces.DecodedJWT
 import java.util.*
 
 class SecurityConfiguration(
-    val secret: String,
-    val issuer: String,
-    val audience: String
+    private val secret: String,
+    private val issuer: String,
+    private val audience: String
 ) {
 
     fun makeAccessToken(username: String, role: String): String = JWT.create()

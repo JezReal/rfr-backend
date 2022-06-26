@@ -3,7 +3,7 @@ package io.github.jezreal.auth.service
 import at.favre.lib.crypto.bcrypt.BCrypt
 import io.github.jezreal.auth.RoleUtil
 import io.github.jezreal.auth.dto.LoginDto
-import io.github.jezreal.auth.dto.RefreshTokenDto
+import io.github.jezreal.auth.dto.RefreshToken
 import io.github.jezreal.auth.model.TokenModel
 import io.github.jezreal.auth.model.UserCredentialModel
 import io.github.jezreal.auth.repository.AuthRepository
@@ -23,6 +23,7 @@ object AuthService {
         if (verifyPassword(credential, loginDto)) {
             val accessToken = securityConfiguration.makeAccessToken(credential.username, credential.role)
             val refreshToken = securityConfiguration.makeRefreshToken(credential.credentialId)
+            authRepository.insertRefreshToken(refreshToken, credential.credentialId)
 
             return TokenModel(accessToken, refreshToken)
         }
@@ -38,6 +39,7 @@ object AuthService {
             if (credential.role == RoleUtil.ADMIN) {
                 val accessToken = securityConfiguration.makeAccessToken(credential.username, credential.role)
                 val refreshToken = securityConfiguration.makeRefreshToken(credential.credentialId)
+                authRepository.insertRefreshToken(refreshToken, credential.credentialId)
 
                 return TokenModel(accessToken, refreshToken)
             }
@@ -55,14 +57,20 @@ object AuthService {
         return result.verified
     }
 
-    fun refreshAccessToken(refreshTokenDto: RefreshTokenDto): String {
-        val decodedJwt = securityConfiguration.validateRefreshToken(refreshTokenDto.refreshToken)
+    fun refreshAccessToken(refreshToken: RefreshToken): String {
+        authRepository.getUserRefreshToken(refreshToken.content)
+            ?: throw AuthenticationException("Invalid refresh token")
+
+        val decodedJwt = securityConfiguration.validateRefreshToken(refreshToken.content)
             ?: throw AuthenticationException("Invalid refresh token")
 
         val credentialId = decodedJwt.getClaim("credentialId").asLong()
 
         val credential = authRepository.getUserCredentialByCredentialId(credentialId)
             ?: throw ResourceNotFoundException("Account does not exist")
+
+        val newRefreshToken = securityConfiguration.makeRefreshToken(credential.credentialId)
+        authRepository.insertRefreshToken(newRefreshToken, credential.credentialId)
 
         return securityConfiguration.makeAccessToken(credential.username, credential.role)
     }
