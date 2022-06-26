@@ -21,9 +21,7 @@ object AuthService {
             ?: throw ResourceNotFoundException("Account not found")
 
         if (verifyPassword(credential, loginDto)) {
-            val accessToken = securityConfiguration.makeAccessToken(credential.username, credential.role)
-            val refreshToken = securityConfiguration.makeRefreshToken(credential.credentialId)
-            authRepository.insertRefreshToken(refreshToken, credential.credentialId)
+            val tokens = makeAccessAndRefreshTokens(credential)
 
             return TokenModel(accessToken, refreshToken)
         }
@@ -37,9 +35,7 @@ object AuthService {
 
         if (verifyPassword(credential, loginDto)) {
             if (credential.role == RoleUtil.ADMIN) {
-                val accessToken = securityConfiguration.makeAccessToken(credential.username, credential.role)
-                val refreshToken = securityConfiguration.makeRefreshToken(credential.credentialId)
-                authRepository.insertRefreshToken(refreshToken, credential.credentialId)
+                val tokens = makeAccessAndRefreshTokens(credential)
 
                 return TokenModel(accessToken, refreshToken)
             }
@@ -74,4 +70,13 @@ object AuthService {
 
         return securityConfiguration.makeAccessToken(credential.username, credential.role)
     }
+    private fun makeAccessAndRefreshTokens(credential: UserCredentialModel): TokenModel {
+        val credentialId = credential.credentialId
+
+        val accessToken = securityConfiguration.makeAccessToken(credential.username, credential.role)
+        val refreshToken = securityConfiguration.makeRefreshToken(credentialId)
+
+        return TokenModel(accessToken, refreshToken)
+    }
+
 }
