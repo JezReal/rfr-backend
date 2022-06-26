@@ -3,6 +3,7 @@ package io.github.jezreal.configuration
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.TokenExpiredException
 import com.auth0.jwt.interfaces.DecodedJWT
 import java.util.*
 
@@ -47,5 +48,14 @@ class SecurityConfiguration(
         }
 
         return null
+    }
+
+    fun isTokenExpired(token: String): Boolean {
+        return try {
+            tokenVerifier().verify(token)
+            false
+        } catch (exception: TokenExpiredException) {
+            true
+        }
     }
 }

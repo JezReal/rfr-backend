@@ -21,9 +21,13 @@ object AuthService {
             ?: throw ResourceNotFoundException("Account not found")
 
         if (verifyPassword(credential, loginDto)) {
+            val credentialId = credential.credentialId
             val tokens = makeAccessAndRefreshTokens(credential)
 
-            return TokenModel(accessToken, refreshToken)
+            deleteExpiredRefreshTokens(credentialId)
+            authRepository.insertRefreshToken(tokens.refreshToken, credentialId)
+
+            return tokens
         }
 
         throw AuthenticationException("Invalid credentials")
@@ -35,9 +39,13 @@ object AuthService {
 
         if (verifyPassword(credential, loginDto)) {
             if (credential.role == RoleUtil.ADMIN) {
+                val credentialId = credential.credentialId
                 val tokens = makeAccessAndRefreshTokens(credential)
 
-                return TokenModel(accessToken, refreshToken)
+                deleteExpiredRefreshTokens(credentialId)
+                authRepository.insertRefreshToken(tokens.refreshToken, credentialId)
+
+                return tokens
             }
 
             throw AuthorizationException("You are not allowed to access this resource")
@@ -66,10 +74,12 @@ object AuthService {
             ?: throw ResourceNotFoundException("Account does not exist")
 
         val newRefreshToken = securityConfiguration.makeRefreshToken(credential.credentialId)
+        deleteExpiredRefreshTokens(credentialId)
         authRepository.insertRefreshToken(newRefreshToken, credential.credentialId)
 
         return securityConfiguration.makeAccessToken(credential.username, credential.role)
     }
+
     private fun makeAccessAndRefreshTokens(credential: UserCredentialModel): TokenModel {
         val credentialId = credential.credentialId
 
@@ -79,4 +89,19 @@ object AuthService {
         return TokenModel(accessToken, refreshToken)
     }
 
+    private fun deleteExpiredRefreshTokens(credentialId: Long) {
+        val userRefreshTokens = authRepository.getUserRefreshTokens(credentialId)
+        val expiredRefreshTokens = mutableListOf<Long>()
+
+        if (userRefreshTokens.isNotEmpty()) {
+            for (token in userRefreshTokens) {
+                if (securityConfiguration.isTokenExpired(token.refreshToken)) {
+                    expiredRefreshTokens.add(token.refreshTokenId)
+                }
+            }
+
+            println("Expired tokens: $expiredRefreshTokens")
+            authRepository.deleteRefreshTokens(expiredRefreshTokens)
+        }
+    }
 }

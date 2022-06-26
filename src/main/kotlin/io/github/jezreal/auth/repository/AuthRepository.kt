@@ -5,9 +5,7 @@ import io.github.jezreal.auth.model.UserCredentialModel
 import io.github.jezreal.tables.auth.AccountTypes
 import io.github.jezreal.tables.auth.Credentials
 import io.github.jezreal.tables.auth.RefreshTokens
-import org.jetbrains.exposed.sql.JoinType
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object AuthRepository {
@@ -63,6 +61,27 @@ object AuthRepository {
                         it[RefreshTokens.refreshToken]
                     )
                 }
+        }
+    }
+
+    fun getUserRefreshTokens(credentialId: Long): List<RefreshTokenModel> {
+        return transaction {
+            RefreshTokens.join(Credentials, JoinType.INNER, additionalConstraint = {
+                RefreshTokens.credentialId eq Credentials.credentialId
+            }).select { Credentials.credentialId eq credentialId }.map {
+                RefreshTokenModel(
+                    it[RefreshTokens.refreshTokenId],
+                    it[RefreshTokens.refreshToken]
+                )
+            }
+        }
+    }
+
+    fun deleteRefreshTokens(tokenIds: List<Long>) {
+        for (tokenId in tokenIds) {
+            transaction {
+                RefreshTokens.deleteWhere { RefreshTokens.refreshTokenId eq tokenId }
+            }
         }
     }
 }
