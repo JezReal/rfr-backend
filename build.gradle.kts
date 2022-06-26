@@ -48,4 +48,6 @@ dependencies {
     implementation ("com.zaxxer:HikariCP:$hikari_version")
 
     implementation ("at.favre.lib:bcrypt:$bcrypt_version")
+
+    implementation("io.ktor:ktor-server-sessions:$ktor_version")
 }
