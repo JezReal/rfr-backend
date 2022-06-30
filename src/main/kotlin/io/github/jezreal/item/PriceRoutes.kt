@@ -6,6 +6,9 @@ import io.github.jezreal.auth.isStore
 import io.github.jezreal.exception.AuthorizationException
 import io.github.jezreal.item.dto.ItemCreatedDto
 import io.github.jezreal.item.dto.ItemPriceDto
+import io.github.jezreal.item.model.toItemPriceByCategoryDto
+import io.github.jezreal.item.model.toItemPriceByCategoryWithIdDto
+import io.github.jezreal.item.model.toItemPriceDto
 import io.github.jezreal.item.service.PriceService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -45,7 +48,7 @@ fun Route.priceRoutes() {
                 throw AuthorizationException("You are not allowed to access this resource")
             }
 
-            call.respond(priceService.getPriceList())
+            call.respond(priceService.getPriceList().toItemPriceByCategoryWithIdDto())
         }
 
         get("/price/{itemId}") {
@@ -61,7 +64,7 @@ fun Route.priceRoutes() {
 
             val itemId = call.parameters["itemId"]?.toLong() ?: throw BadRequestException("Invalid item id")
 
-            call.respond(priceService.getPriceByItemId(itemId))
+            call.respond(priceService.getPriceByItemId(itemId).toItemPriceDto())
         }
 
         get("/price/category/{categoryId}") {
@@ -77,7 +80,7 @@ fun Route.priceRoutes() {
 
             val categoryId = call.parameters["categoryId"]?.toLong() ?: throw BadRequestException("Invalid item id")
 
-            call.respond(priceService.getPriceListByItemCategory(categoryId))
+            call.respond(priceService.getPriceListByItemCategory(categoryId).toItemPriceByCategoryDto())
         }
     }
 }

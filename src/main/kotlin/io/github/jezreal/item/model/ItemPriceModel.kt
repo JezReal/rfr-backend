@@ -2,6 +2,7 @@ package io.github.jezreal.item.model
 
 import io.github.jezreal.exception.ResourceNotFoundException
 import io.github.jezreal.item.dto.ItemPriceByCategoryDto
+import io.github.jezreal.item.dto.ItemPriceByCategoryWithIdDto
 import io.github.jezreal.item.dto.ItemPriceDto
 import io.github.jezreal.item.dto.ItemPriceWithIdDto
 
@@ -50,4 +51,25 @@ fun List<ItemPriceModel>.toItemPriceByCategoryDto(): ItemPriceByCategoryDto {
         category,
         items
     )
+}
+
+fun List<ItemPriceModel>.toItemPriceByCategoryWithIdDto(): List<ItemPriceByCategoryWithIdDto> {
+    val categories = this.distinctBy { it.itemCategory }
+    val priceListByCategory = mutableListOf<ItemPriceByCategoryWithIdDto>()
+
+    for (category in categories) {
+        val pricesInCategory = this.filter {
+            it.itemCategory == category.itemCategory
+        }.toItemPriceWithIdDto().sortedBy { it.itemId }
+
+        priceListByCategory.add(
+            ItemPriceByCategoryWithIdDto(
+                category.itemCategoryId,
+                category.itemCategory,
+                pricesInCategory
+            )
+        )
+    }
+
+    return priceListByCategory
 }
