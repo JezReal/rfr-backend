@@ -63,4 +63,19 @@ object ItemRepository {
             }
         }
     }
+
+    fun getItemByItemId(itemId: Long): ItemModel? {
+        return transaction {
+            Items.join(ItemCategories, JoinType.INNER, additionalConstraint = {
+                Items.itemCategoryId eq ItemCategories.itemCategoryId
+            }).select { Items.itemId eq itemId }.firstOrNull()?.let {
+                ItemModel(
+                    it[Items.itemId],
+                    it[ItemCategories.itemCategoryId],
+                    it[ItemCategories.itemCategory],
+                    it[Items.itemName]
+                )
+            }
+        }
+    }
 }

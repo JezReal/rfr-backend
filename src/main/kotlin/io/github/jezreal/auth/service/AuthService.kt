@@ -4,6 +4,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import io.github.jezreal.auth.RoleUtil
 import io.github.jezreal.auth.dto.LoginDto
 import io.github.jezreal.auth.dto.RefreshToken
+import io.github.jezreal.auth.model.StoreModel
 import io.github.jezreal.auth.model.TokenModel
 import io.github.jezreal.auth.model.UserCredentialModel
 import io.github.jezreal.auth.repository.AuthRepository
@@ -103,5 +104,12 @@ object AuthService {
             println("Expired tokens: $expiredRefreshTokens")
             authRepository.deleteRefreshTokens(expiredRefreshTokens)
         }
+    }
+
+    fun getStoreInfoByUsername(username: String): StoreModel {
+        val credentialId = authRepository.getUserCredentialByUsername(username)?.credentialId
+            ?: throw ResourceNotFoundException("Account not found")
+
+        return authRepository.getStoreInfo(credentialId) ?: throw ResourceNotFoundException("Store not found")
     }
 }

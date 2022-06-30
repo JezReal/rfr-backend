@@ -4,6 +4,7 @@ import io.github.jezreal.auth.authRoutes
 import io.github.jezreal.item.itemRoutes
 import io.github.jezreal.item.priceRoutes
 import io.github.jezreal.response.Response
+import io.github.jezreal.store.storeRoutes
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -16,6 +17,7 @@ fun Routing.apiRoutes() {
         authRoutes()
         priceRoutes()
         itemRoutes()
+        storeRoutes()
     }
 }
 

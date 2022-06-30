@@ -1,11 +1,16 @@
 package io.github.jezreal.auth.repository
 
 import io.github.jezreal.auth.model.RefreshTokenModel
+import io.github.jezreal.auth.model.StoreModel
 import io.github.jezreal.auth.model.UserCredentialModel
 import io.github.jezreal.tables.auth.AccountTypes
 import io.github.jezreal.tables.auth.Credentials
 import io.github.jezreal.tables.auth.RefreshTokens
-import org.jetbrains.exposed.sql.*
+import io.github.jezreal.tables.store.Stores
+import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object AuthRepository {
@@ -81,6 +86,23 @@ object AuthRepository {
         for (tokenId in tokenIds) {
             transaction {
                 RefreshTokens.deleteWhere { RefreshTokens.refreshTokenId eq tokenId }
+            }
+        }
+    }
+
+    fun getStoreInfo(credentialId: Long): StoreModel? {
+        return transaction {
+            Stores.join(Credentials, JoinType.INNER, additionalConstraint = {
+                Stores.credentialId eq Credentials.credentialId
+            }).select { Credentials.credentialId eq credentialId }.firstOrNull()?.let {
+                StoreModel(
+                    it[Credentials.credentialId],
+                    it[Credentials.username],
+                    it[Credentials.password],
+                    it[Stores.storeId],
+                    it[Stores.storeName],
+                    it[Stores.storeAddress]
+                )
             }
         }
     }
