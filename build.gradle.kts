@@ -36,6 +36,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-gson-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.ktor:ktor-server-sessions-jvm:$ktor_version")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
@@ -48,6 +49,4 @@ dependencies {
     implementation ("com.zaxxer:HikariCP:$hikari_version")
 
     implementation ("at.favre.lib:bcrypt:$bcrypt_version")
-
-    implementation("io.ktor:ktor-server-sessions:$ktor_version")
 }
