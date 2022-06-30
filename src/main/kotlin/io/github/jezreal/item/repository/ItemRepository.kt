@@ -1,10 +1,12 @@
 package io.github.jezreal.item.repository
 
+import io.github.jezreal.item.model.ItemCategoryModel
 import io.github.jezreal.item.model.ItemModel
 import io.github.jezreal.tables.item.ItemCategories
 import io.github.jezreal.tables.item.Items
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object ItemRepository {
@@ -37,6 +39,28 @@ object ItemRepository {
                         it[Items.itemName]
                     )
                 }
+        }
+    }
+
+    fun getItemCategories(): List<ItemCategoryModel> {
+        return transaction {
+            ItemCategories.selectAll().map {
+                ItemCategoryModel(
+                    it[ItemCategories.itemCategoryId],
+                    it[ItemCategories.itemCategory]
+                )
+            }.distinctBy { it.itemCategoryId }
+        }
+    }
+
+    fun getItemCategoryById(categoryId: Long): ItemCategoryModel? {
+        return transaction {
+            ItemCategories.select { ItemCategories.itemCategoryId eq categoryId }.firstOrNull()?.let {
+                ItemCategoryModel(
+                    it[ItemCategories.itemCategoryId],
+                    it[ItemCategories.itemCategory]
+                )
+            }
         }
     }
 }
