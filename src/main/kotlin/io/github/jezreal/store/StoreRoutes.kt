@@ -6,6 +6,7 @@ import io.github.jezreal.exception.AuthorizationException
 import io.github.jezreal.exception.BadRequestException
 import io.github.jezreal.item.dto.AddStoreItemDto
 import io.github.jezreal.item.dto.InventoryItemCreatedDto
+import io.github.jezreal.store.model.toItemInventoryByCategoryWithIdDto
 import io.github.jezreal.store.service.StoreService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -44,6 +45,22 @@ fun Route.storeRoutes() {
                     HttpStatusCode.Created,
                     InventoryItemCreatedDto(storeService.addItemToStoreInventory(requestBody, username))
                 )
+            }
+
+            get("/inventory") {
+                val principal = call.principal<JWTPrincipal>()
+
+                if (!isAccessToken(principal!!)) {
+                    throw AuthorizationException("Invalid token type")
+                }
+
+                if (!isStore(principal)) {
+                    throw AuthorizationException("You are not allowed to access this resource")
+                }
+
+                val username = principal.payload.getClaim("username").asString()
+
+                call.respond(storeService.getStoreInventory(username).toItemInventoryByCategoryWithIdDto())
             }
         }
     }

@@ -3,6 +3,7 @@ package io.github.jezreal.store.service
 import io.github.jezreal.auth.service.AuthService
 import io.github.jezreal.item.dto.AddStoreItemDto
 import io.github.jezreal.item.service.ItemService
+import io.github.jezreal.store.model.ItemInventoryModel
 import io.github.jezreal.store.repository.StoreRepository
 
 object StoreService {
@@ -15,5 +16,11 @@ object StoreService {
         val itemCategoryId = itemService.getItemByItemId(addStoreItemDto.itemId).itemCategoryId
 
         return storeRepository.addItemToStoreInventory(addStoreItemDto, storeId, itemCategoryId)
+    }
+
+    fun getStoreInventory(username: String): List<ItemInventoryModel> {
+        val storeId = authService.getStoreInfoByUsername(username).storeId
+
+        return storeRepository.getStoreInventory(storeId)
     }
 }
