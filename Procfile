@@ -1,0 +1,1 @@
+web: ./build/install/rfr-backend/bin/rfr-backend
