@@ -29,10 +29,11 @@ fun configureDatabase() {
     val dataSource = HikariDataSource(hikariConfig)
     Database.connect(dataSource)
 
-    dropTables()
-    createTables()
-    prepopulateTables()
+//    dropTables()
+//    createTables()
+//    prepopulateTables()
 }
+
 private fun createTables() {
     transaction {
         addLogger(StdOutSqlLogger)
